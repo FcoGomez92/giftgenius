@@ -9,9 +9,12 @@ export default function Home() {
     <>
       <Head>
         <title>GiftGenius</title>
-        <meta name="description" content="GiftGenius web app, the perfect gifts for your loved one. Don't to know again what to gift to your father, to your mother, to your couple or to your friend? GiftGenius studies their social media profile with AI for you, and based on it recommends you the best gifts. Save time and look like a genius." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta
+          name='description'
+          content="GiftGenius web app, the perfect gifts for your loved one. Don't to know again what to gift to your father, to your mother, to your couple or to your friend? GiftGenius studies their social media profile with AI for you, and based on it recommends you the best gifts. Save time and look like a genius."
+        />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <link rel='icon' href='/favicon.ico' />
       </Head>
       <main className={styles.main}>
         <div className={styles.center}>
