@@ -5,6 +5,13 @@ const twitterClient = new Client(TWITTER_TOKEN)
 
 const MAX_RESULTS = 20
 
+const cleanTweets = (tweets) =>
+  tweets.map((t) => `"${t.text.replaceAll('\n', ' ').replaceAll('"', "'")}".`)
+// tweets.map(
+//   (t) =>
+//     `"${t.text.replace(/[\n"]/g, (match) => (match === '\n' ? '' : "'"))}".`
+// )
+
 export async function getUserTwitterInfo(userTwitterHandle) {
   try {
     const usernameLookup = await twitterClient.users.findUserByUsername(
@@ -52,6 +59,9 @@ function getTweetsPaginated(userTwitterId, params, nextToken) {
 }
 
 export async function getUserTweets(userTwitterId, excludeArray) {
+  let userTweets = []
+  let pagesCount = 2
+  let nextToken
   const params = {
     max_results: MAX_RESULTS
     // exclude: ["replies", "retweets"],
@@ -59,9 +69,29 @@ export async function getUserTweets(userTwitterId, excludeArray) {
   if (excludeArray) {
     params.exclude = excludeArray
   }
-  try {
-    return await getTweetsPaginated(userTwitterId, params, null)
-  } catch (error) {
-    console.log(error)
+
+  console.log('Retrieving Tweets...')
+
+  while (pagesCount > 0) {
+    const resp = await getTweetsPaginated(userTwitterId, params, nextToken)
+
+    if (
+      resp &&
+      resp.meta &&
+      resp.meta.result_count &&
+      resp.meta.result_count > 0
+    ) {
+      if (resp.data) {
+        userTweets.push.apply(userTweets, resp.data)
+        pagesCount--
+      }
+      if (pagesCount > 0 && resp.meta.next_token) {
+        nextToken = resp.meta.next_token
+      }
+    } else {
+      pagesCount = 0
+    }
   }
+  console.log(`Got ${userTweets.length}!`)
+  return cleanTweets(userTweets)
 }
