@@ -1,5 +1,98 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { getUserTwitterInfo, getUserTweets } from '@/lib/twitter'
+import { talkToChatGPT } from '@/lib/openai'
+// import { tweets } from '@/mocks/tweets'
+import { i18n } from '@/mocks/i18n'
+import { errorMessages } from '@/helpers/errors'
 
-export default function handler(req, res) {
-  res.status(200).json({ name: 'John Doe' })
+const createPrompt = (lang, tweets) =>
+  `${i18n.prefix[lang]}${tweets.join(', ')} ${i18n.suffix[lang]}`
+
+const lang = 'es'
+
+export default async function handler(req, res) {
+  const { userHandler } = req.query
+  const excludeArray = ['replies', 'retweets']
+
+  if (!userHandler)
+    return res
+      .status(400)
+      .json({ ok: false, message: errorMessages.app.emptyParam })
+
+  // GET USER TWITTER INFO
+  const userInfoResponse = await getUserTwitterInfo(userHandler)
+  const userInfo = userInfoResponse?.data
+
+  // ERROR HANDLER GETTING USER TWITTER INFO
+  if (!userInfo) {
+    const status = userInfoResponse?.status
+    const message =
+      status === 404
+        ? errorMessages.twitter.user404
+        : errorMessages.twitter[status] ?? errorMessages.generic
+
+    return res.status(status).json({
+      ok: false,
+      message
+    })
+  }
+
+  // GET TWEETS
+  const userTweetsResponse = await getUserTweets(userInfo.id, excludeArray)
+  const userTweets = userTweetsResponse?.data
+
+  // ERROR HANDLER GETTING TWEETS
+  if (!userTweets) {
+    const status = userTweetsResponse?.status
+    const message =
+      status === 404
+        ? errorMessages.twitter.tweets404
+        : errorMessages.twitter[status] ?? errorMessages.generic
+
+    return res.status(status).json({
+      ok: false,
+      message
+    })
+  }
+
+  // GET LIST OF GIFTS FROM CHATGPT
+  const prompt = createPrompt(lang, userTweets)
+  const chatGPTResponse = await talkToChatGPT(prompt)
+
+  // EXAMPLE OF ERROR RESPONSE DUE TO A LONG PROMPT
+  // response:{
+  // ...,
+  //   data: {
+  //    error: {
+  //     message: "This model's maximum context length is 4097 tokens. However, your messages resulted in 5137 tokens. Please reduce the length of the messages.",
+  //     type: 'invalid_request_error',
+  //     param: 'messages',
+  //     code: 'context_length_exceeded'
+  //   }
+  //  }
+  // }
+  console.log({ chatGPTResponse })
+
+  // ERROR HANDLER GETTING LIST OF GIFTS
+  if (chatGPTResponse.status !== 200) {
+    const status = chatGPTResponse?.status ?? 400
+    const message = errorMessages.openAI[status] ?? errorMessages.generic
+    if (chatGPTResponse?.data?.error?.code === 'context_length_exceeded') {
+      return res
+        .status(400)
+        .json({ ok: false, message: errorMessages.openAI.prompt })
+    }
+
+    return res.status(status).json({
+      ok: false,
+      message
+    })
+  }
+  console.log({ choices: chatGPTResponse.data.choices[0].message })
+  console.log({ usage: chatGPTResponse.data.usage })
+  const gifts = chatGPTResponse?.data?.choices[0]?.message?.content
+
+  return res.status(200).json({
+    ok: true,
+    data: gifts
+  })
 }

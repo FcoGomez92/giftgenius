@@ -1,10 +1,27 @@
 import Head from 'next/head'
+import { useRef } from 'react'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  const inputRef = useRef()
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    const url = `api/hello?userHandler=${inputRef.current.value}`
+
+    const res = await fetch(url)
+    const { ok, message, data } = await res.json()
+
+    if (!ok) {
+      console.log(message)
+    }
+    console.log(data)
+    return
+  }
+
   return (
     <>
       <Head>
@@ -22,6 +39,10 @@ export default function Home() {
             <h1 className={inter.className}>GG</h1>
           </div>
         </div>
+        <form onSubmit={handleSubmit}>
+          <input ref={inputRef} type='text' className={styles.input} />
+          <button>Enviar</button>
+        </form>
       </main>
     </>
   )
