@@ -6,11 +6,10 @@ const twitterClient = new Client(TWITTER_TOKEN)
 const MAX_RESULTS = 20
 
 const cleanTweets = (tweets) =>
-  tweets.map((t) => `"${t.text.replaceAll('\n', ' ').replaceAll('"', "'")}".`)
-// tweets.map(
-//   (t) =>
-//     `"${t.text.replace(/[\n"]/g, (match) => (match === '\n' ? '' : "'"))}".`
-// )
+  tweets.map(
+    (t) =>
+      `"${t.text.replace(/[\n"]/g, (match) => (match === '\n' ? ' ' : "'"))}".`
+  )
 
 export async function getUserTwitterInfo(userTwitterHandle) {
   try {
@@ -34,27 +33,33 @@ export async function getUserTwitterInfo(userTwitterHandle) {
       const pinnedTweet = usernameLookup?.includes?.tweets[0]?.text
 
       return {
-        id,
-        name,
-        username,
-        bio,
-        profileImage,
-        pinnedTweet
+        data: {
+          id,
+          name,
+          username,
+          bio,
+          profileImage,
+          pinnedTweet
+        }
       }
+    } else {
+      return { data: null, status: 404 }
     }
   } catch (error) {
     console.log(error)
+    return { data: null, status: error.status ?? 400 }
   }
 }
 
-function getTweetsPaginated(userTwitterId, params, nextToken) {
+async function getTweetsPaginated(userTwitterId, params, nextToken) {
   if (nextToken) {
     params.pagination_token = nextToken
   }
   try {
-    return twitterClient.tweets.usersIdTweets(userTwitterId, params)
-  } catch (err) {
-    throw new Error(`Request failed: ${err}`)
+    return await twitterClient.tweets.usersIdTweets(userTwitterId, params)
+  } catch (error) {
+    console.log(error)
+    return { data: null, status: error.status ?? 400 }
   }
 }
 
@@ -64,13 +69,10 @@ export async function getUserTweets(userTwitterId, excludeArray) {
   let nextToken
   const params = {
     max_results: MAX_RESULTS
-    // exclude: ["replies", "retweets"],
   }
   if (excludeArray) {
     params.exclude = excludeArray
   }
-
-  console.log('Retrieving Tweets...')
 
   while (pagesCount > 0) {
     const resp = await getTweetsPaginated(userTwitterId, params, nextToken)
@@ -90,8 +92,9 @@ export async function getUserTweets(userTwitterId, excludeArray) {
       }
     } else {
       pagesCount = 0
+      return { data: resp?.data ?? null, status: resp?.status ?? 404 }
     }
   }
-  console.log(`Got ${userTweets.length}!`)
-  return cleanTweets(userTweets)
+
+  return { data: cleanTweets(userTweets) }
 }

@@ -16,6 +16,6 @@ export async function talkToChatGPT(prompt) {
     })
   } catch (error) {
     console.log(error)
-    return error.response.data
+    return { data: error.response.data, status: error.response.status }
   }
 }
