@@ -8,11 +8,14 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration)
 
-export async function talkToChatGPT(prompt) {
+export async function talkToChatGPT(systemMessage, prompt) {
   try {
     return await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }]
+      messages: [
+        { role: 'system', content: systemMessage },
+        { role: 'user', content: prompt }
+      ]
     })
   } catch (error) {
     console.log(error)

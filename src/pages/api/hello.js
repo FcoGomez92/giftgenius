@@ -2,14 +2,13 @@ import { getUserTwitterInfo } from '@/lib/twitter'
 import { getUserTweets } from '@/controllers/getUserTweets'
 import { talkToChatGPT } from '@/lib/openai'
 import { encode } from 'gpt-3-encoder'
-import { i18n } from '@/mocks/i18n'
 import { clean } from '@/helpers/functions'
 import { errorMessages } from '@/helpers/errors'
-
-const createPrompt = (lang, userData) =>
-  `${i18n.prefix[lang]}${userData.join(', ')} ${i18n.suffix[lang]}`
+import { i18n } from '@/mocks/i18n'
 
 const lang = 'es'
+
+const createPrompt = (userData) => userData.join(', ')
 
 export default async function handler(req, res) {
   const { userHandler } = req.query
@@ -72,8 +71,9 @@ export default async function handler(req, res) {
   userDataToChatGPT.push(...userTweets.reverse())
 
   // GET LIST OF GIFTS FROM CHATGPT
-  const prompt = createPrompt(lang, userDataToChatGPT)
-  const chatGPTResponse = await talkToChatGPT(prompt)
+  const systemMessage = i18n.prefix[lang]
+  const prompt = createPrompt(userDataToChatGPT)
+  const chatGPTResponse = await talkToChatGPT(systemMessage, prompt)
 
   // EXAMPLE OF ERROR RESPONSE DUE TO A LONG PROMPT
   // response:{
