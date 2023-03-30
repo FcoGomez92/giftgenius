@@ -1,49 +1,59 @@
 import Head from 'next/head'
-import { useRef } from 'react'
-import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
+import { Michroma, Inter } from 'next/font/google'
+import Link from 'next/link'
+import Navbar from '@/components/navbar'
+import Search from '@/components/search'
+import Footer from '@/components/footer'
 
+const michroma = Michroma({ subsets: ['latin'], weight: '400' })
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const inputRef = useRef()
-
-  async function handleSubmit(event) {
-    event.preventDefault()
-    const url = `api/hello?userHandler=${inputRef.current.value}`
-
-    const res = await fetch(url)
-    const { ok, message, data } = await res.json()
-
-    if (!ok) {
-      console.log(message)
-    }
-    console.log(data)
-    return
-  }
-
   return (
     <>
       <Head>
-        <title>GiftGenius</title>
+        <title>
+          GiftGenius || Ai-powered app to find the perfect gift for your loved
+          ones based on their twitter profile
+        </title>
         <meta
           name='description'
-          content="GiftGenius web app, the perfect gifts for your loved one. Don't to know again what to gift to your father, to your mother, to your couple or to your friend? GiftGenius studies their social media profile with AI for you, and based on it recommends you the best gifts. Save time and look like a genius."
+          content="GiftGenius web app, the perfect gifts for your loved one. Don't you know again what to gift to your father, mother, partner or friend? GiftGenius uses AI to analyze their twitter profile for you, and suggest the ideal gifts based on their interests. Save time and look like a genius."
         />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.center}>
-          <div className={styles.thirteen}>
-            <h1 className={inter.className}>GG</h1>
-          </div>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <input ref={inputRef} type='text' className={styles.input} />
-          <button>Enviar</button>
-        </form>
-      </main>
+      <div className={`${inter.className} ${styles.container}`}>
+        <Navbar />
+        <div className={styles.bkg} />
+        <main className={styles.main}>
+          <section id='hero' className={`${styles.section} ${styles.hero}`}>
+            <h1 className={`${michroma.className} ${styles.title}`}>
+              Never give a bad gift again. <br />
+              Finding the perfect one,
+              <br />
+              now, it seems like Magic ✨
+            </h1>
+            <h2 className={styles.subtitle}>
+              Struggled again choosing the perfect gift for your father, mother,
+              partner, or friend?
+            </h2>
+            <p className={styles.desc}>
+              Our AI-powered engine analyze their Twitter profile and suggest
+              the ideal gifts based on their interests. <br />
+              Save time and impress them with your gift-giving skills!
+            </p>
+            <Link href='#search'>
+              <p className={styles.cta}>Try it now!</p>
+            </Link>
+          </section>
+          <section id='search' className={styles.section}>
+            <Search />
+          </section>
+        </main>
+        <Footer font={inter} />
+      </div>
     </>
   )
 }

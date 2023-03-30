@@ -1,0 +1,10 @@
+.logo {
+cursor: default;
+user-select: none;
+}
+
+.logo span {
+  background: linear-gradient(109.5deg, rgb(92, 121, 255) 11.2%, rgb(76, 221, 242) 91.1%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
