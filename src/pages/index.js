@@ -33,14 +33,10 @@ export default function Home() {
               Never give a bad gift again. <br />
               Finding the perfect one,
               <br />
-              now, it seems like Magic ✨
+              now, it&apos;s like Magic ✨
             </h1>
-            <h2 className={styles.subtitle}>
-              Struggled again choosing the perfect gift for your father, mother,
-              partner, or friend?
-            </h2>
             <p className={styles.desc}>
-              Our AI-powered engine analyze their Twitter profile and suggest
+              Our AI-powered engine analyze your loved ones twitter profile and suggest
               the ideal gifts based on their interests. <br />
               Save time and impress them with your gift-giving skills!
             </p>
@@ -48,7 +44,7 @@ export default function Home() {
               <p className={styles.cta}>Try it now!</p>
             </Link>
           </section>
-          <section id='search' className={styles.section}>
+          <section id='search' className={`${styles.section} ${styles.app}`}>
             <Search />
           </section>
         </main>

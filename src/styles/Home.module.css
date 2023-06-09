@@ -133,18 +133,22 @@
     to bottom right,
     rgba(var(--tile-start-rgb), 1),
     rgba(var(--tile-end-rgb), 1)
-  );
-  background-clip: content-box;
-}
-
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
+    );
+    background-clip: content-box;
+  }
   
-}
+  .section.app {
+    justify-content: center;
+  }
 
-@media (prefers-reduced-motion) {
-  .cta::before {
-    animation: none;
+  /* Enable hover only on non-touch devices */
+  @media (hover: hover) and (pointer: fine) {
+    
+  }
+  
+  @media (prefers-reduced-motion) {
+    .cta::before {
+      animation: none;
   }
 }
 

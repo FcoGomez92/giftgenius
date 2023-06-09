@@ -6,19 +6,5 @@ const configuration = new Configuration({
   apiKey: OPENAI_API_KEY
 })
 
-const openai = new OpenAIApi(configuration)
+export const openai = new OpenAIApi(configuration)
 
-export async function talkToChatGPT(systemMessage, prompt) {
-  try {
-    return await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: systemMessage },
-        { role: 'user', content: prompt }
-      ]
-    })
-  } catch (error) {
-    console.log(error)
-    return { data: error.response.data, status: error.response.status }
-  }
-}

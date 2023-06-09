@@ -1,6 +1,5 @@
-import { getUserTwitterInfo } from '@/lib/twitter'
-import { getUserTweets } from '@/controllers/getUserTweets'
-import { talkToChatGPT } from '@/lib/openai'
+import { getUserTweets } from '@/controllers/twitterControllers'
+import { talkToChatGPT } from '@/controllers/openAIControllers'
 import { encode } from 'gpt-3-encoder'
 import { clean } from '@/helpers/functions'
 import { errorMessages } from '@/helpers/errors'
@@ -11,32 +10,16 @@ const lang = 'es'
 const createPrompt = (userData) => userData.join(', ')
 
 export default async function handler(req, res) {
-  const { userHandler } = req.query
+  const { userInfo } = JSON.parse(req.body)
   const excludeArray = ['replies', 'retweets']
   const userDataToChatGPT = []
 
-  if (!userHandler)
-    return res
-      .status(400)
-      .json({ ok: false, message: errorMessages.app.emptyParam })
-
-  // GET USER TWITTER INFO
-  const userInfoResponse = await getUserTwitterInfo(userHandler)
-  const userInfo = userInfoResponse?.data
-
   // ERROR HANDLER GETTING USER TWITTER INFO
-  if (!userInfo) {
-    const status = userInfoResponse?.status
-    const message =
-      status === 404
-        ? errorMessages.twitter.user404
-        : errorMessages.twitter[status] ?? errorMessages.generic
-
-    return res.status(status).json({
+  if (!userInfo)
+    return res.status(404).json({
       ok: false,
-      message
+      message: errorMessages.twitter.user404
     })
-  }
 
   if (userInfo.bio) userDataToChatGPT.push(clean(userInfo.bio, 'Bio: '))
   if (userInfo.pinnedTweet)
@@ -103,7 +86,9 @@ export default async function handler(req, res) {
       message
     })
   }
-
+  console.log({
+    chatGPTResponse: chatGPTResponse?.data?.choices[0]?.message?.content
+  })
   // SEND THE CHATGPT RESPONSE TO THE APP
   console.log({ usage: chatGPTResponse.data.usage })
   const gifts = chatGPTResponse?.data?.choices[0]?.message?.content

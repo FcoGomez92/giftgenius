@@ -1,8 +1,8 @@
-Side project en proceso. Desarrollado por [@FcoGomez92\_](https://twitter.com/fcogomez92_) para probar las API's de OpenAI y Twitter. Nace inspirado por el proyecto [abbrevia.me](https://abbrevia.me) de [@itortv](https://twitter.com/itortv)
+Side project in progress. Developed by [@FcoGomez92\_](https://twitter.com/fcogomez92_) to test OpenAI and Twitter APIs. It is inspired by [abbrevia.me](https://abbrevia.me) project developed by [@itortv](https://twitter.com/itortv)
 
-GiftGenius es una herramienta de asistencia que te ayuda a elegir el regalo perfecto para cualquier persona. Utiliza inteligencia artificial para analizar el perfil de Twitter de la persona en cuestión y devuelve un breve informe con su descripción, gustos y necesidades. Además, te presenta una lista de cinco productos seleccionados especialmente para esa persona, para que puedas sorprenderla con un regalo personalizado y acertado.
+GiftGenius is an assistance tool that helps you choose the perfect gift for anyone. It utilizes artificial intelligence to analyze the Twitter profile of the person in question and returns a brief report with their description, likes, and needs. Additionally, it presents a list of five specially selected products for that person, allowing you to surprise them with a personalized and fitting gift.
 
-La idea final es monetizar a través de la API de afiliados de Amazon, permitiendo que los resultados de búsqueda se presenten en forma de fichas de productos completas con la opción de compra directa en Amazon.
+The ultimate idea is to monetize through the Amazon affiliate API, enabling search results to be displayed as complete product cards with the option for direct purchase.
 
 ## Getting Started
 
@@ -12,23 +12,28 @@ First, run the development server:
 npm run dev
 ```
 
+Config your .env.local file with your twitter token and openAI api key. Example:
+
+TWITTER_TOKEN=XXXXXXXXXXXXXXXXXX
+OPENAI_API_KEY=XXXXXXXXXXXXXXX
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## TAREAS PENDIENTES O IDEAS PARA FEATURES:
+## PENDING WORK AND NEXT FEATURES:
 
-1. Terminar el diseño y funcionalidad del front.
+1. Finish the design and add save user queries result into local storage to preview later if needed.
 
-2. Incluir opciones avanzadas del prompt desde el front. Por ejemplo: Seleccionar parentesco con la persona, motivo del regalo (cumpleaños, Reyes, Navidad, San valentin, aniversario, etc...), presupuesto máximo.
+2. Include advanced prompt options from the front end. For example: Selecting the relationship with the person, occasion for the gift (birthday, Christmas, Valentine's Day, anniversary, etc.), maximum budget.
 
-3. Limpiar las urls de los twits. Eliminarlos directamente o sustituirlos por el indicador "(url, imagen o video)". Ejemplo de implementación:
+3. Clean up the URLs of the tweets. Either remove them directly or replace them with the indicator "(url, image, or video)". This action reduce the number of token sent to OpenAI. Example of implementation:
 
 - OPT 1:
 
 ```
-let textoSinUrls = textoConUrls.replace(/https:\/\/[\n\S]+/gi, '');
+let textWithoutUrls = textWithUrls.replace(/https:\/\/[\n\S]+/gi, '');
 ```
 
-4. Aislar la lista de productos en un array para luego usar la api de amazon affiliate para buscar esos productos. Ejemplos de implementación:
+4. Isolate the list of products in an array and then use the Amazon Affiliate API to search for those products. Implementation examples:
 
 - OPT 1:
 
@@ -40,13 +45,13 @@ let textoSinUrls = textoConUrls.replace(/https:\/\/[\n\S]+/gi, '');
 - OPT 2:
 
 ```
-   let inicioProductos = texto.indexOf("PRODUCTOS:") + 11;
-   let finProductos = texto.length;
-   let productosTexto = texto.slice(inicioProductos, finProductos).trim();
-   let productosArray = productosTexto.split(/\d+\./).slice(1).map((producto) => producto.trim());
+   let startIndex = str.indexOf("PRODUCTOS:") + 11;
+   let endIndex = str.length;
+   let products = str.slice(startIndex, endIndex).trim();
+   let productsArray = products.split(/\d+\./).slice(1).map((product) => product.trim());
 ```
 
-5. Aislar los numeros de tokens usados y tokens maximos al llamar a openAI en el caso de que el prompt sea demasiado largo para luego recortar los twits necesarios y reiniciar la petición. Ejemplos de implementación:
+5. Isolate the used token count and maximum token count when calling OpenAI. In case the prompt is too long, then trim the necessary tweets and restart the request. Implementation examples:
 
 - OPT 1:
 
