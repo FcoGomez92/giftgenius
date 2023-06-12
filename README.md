@@ -29,7 +29,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - OPT 1:
 
-```
+```javascript
 let textWithoutUrls = textWithUrls.replace(/https:\/\/[\n\S]+/gi, '');
 ```
 
@@ -37,34 +37,32 @@ let textWithoutUrls = textWithUrls.replace(/https:\/\/[\n\S]+/gi, '');
 
 - OPT 1:
 
-```
-     const str = "...";
-     const productsArray = str.split("\n").splice(-5);
+```javascript
+const str = "...";
+const productsArray = str.split("\n").splice(-5);
 ```
 
 - OPT 2:
 
-```
-   let startIndex = str.indexOf("PRODUCTOS:") + 11;
-   let endIndex = str.length;
-   let products = str.slice(startIndex, endIndex).trim();
-   let productsArray = products.split(/\d+\./).slice(1).map((product) => product.trim());
+```javascript
+let startIndex = str.indexOf("PRODUCTOS:") + 11;
+let endIndex = str.length;
+let products = str.slice(startIndex, endIndex).trim();
+let productsArray = products.split(/\d+\./).slice(1).map((product) => product.trim());
 ```
 
 5. Isolate the used token count and maximum token count when calling OpenAI. In case the prompt is too long, then trim the necessary tweets and restart the request. Implementation examples:
 
 - OPT 1:
 
-```
+```javascript
 const numbers = str.split(" ").filter(w=>!isNaN(w))
 ```
 
 - OPT 2:
 
-```
- const str = "This model's maximum context length is 4097 tokens. However, your messages resulted in 5137 tokens. Please reduce the   length of the messages.";
-          const regex = /\d+/g;
-          const numbers = str.match(regex);
-
-
+```javascript
+const str = "This model's maximum context length is 4097 tokens. However, your messages resulted in 5137 tokens. Please reduce the   length of the messages.";
+const regex = /\d+/g;
+const numbers = str.match(regex);
 ```
